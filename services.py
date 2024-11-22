@@ -4,19 +4,20 @@ import constants
 from textblob import TextBlob
 import regex as re
 import requests
-from gingerit.gingerit import GingerIt
+# from gingerit.gingerit import GingerIt
+from urllib.parse import urlparse, parse_qs
 
-import rpy2.robjects as robjects
+# import rpy2.robjects as robjects
 import pandas as pd
 import matplotlib.pyplot as plt
-from rpy2.robjects import pandas2ri
-from rpy2.rinterface_lib.embedded import RRuntimeError
-from rpy2.robjects.packages import importr
+# from rpy2.robjects import pandas2ri
+# from rpy2.rinterface_lib.embedded import RRuntimeError
+# from rpy2.robjects.packages import importr
 
 
-utils = importr('utils')
-pandas2ri.activate()
-warnings.filterwarnings("ignore")
+# utils = importr('utils')
+# pandas2ri.activate()
+# warnings.filterwarnings("ignore")
 
 
 def extract_youtube_video_title(url):
@@ -27,13 +28,17 @@ def extract_youtube_video_title(url):
 
 
 def extract_youtube_video_id(url):
-    pattern = r"(?<=v=|\/videos\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|\&v=|\?v=)([^#\&\?]*)(?=\?|\&|\#|$|\z)"
-    match = re.search(pattern, url)
-    if match:
-        video_id = match.group(1)
-        return video_id
-    else:
-        return None
+    # pattern = r"(?<=v=|\/videos\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|\&v=|\?v=)([^#\&\?]*)(?=\?|\&|\#|$|\z)"
+    # match = re.search(pattern, url)
+    # if match:
+    #     video_id = match.group(1)
+    #     return video_id
+    # else:
+    #     return None
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    value_of_v = query_params.get('v', [None])[0]
+    return value_of_v
 
 
 def get_comments(vid_id, comments, nextPageToken):
@@ -47,6 +52,7 @@ def get_comments(vid_id, comments, nextPageToken):
         nextPageToken = data['nextPageToken']
     except:
         nextPageToken = ''
+    print(data)
     comments = []
     for item in data['items']:
         comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
